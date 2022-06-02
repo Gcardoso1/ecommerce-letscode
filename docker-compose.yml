@@ -1,0 +1,129 @@
+version: "3.3"
+
+services:
+  eureka:
+    container_name: ec-eureka
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - backend
+    ports:
+      - '8761:8761'  
+
+  rabbitmq:
+    container_name: ec-rabbitmq
+    image: rabbitmq:3-management
+    restart: always
+    networks:
+      - backend
+    ports:
+      - '15672:15672'
+
+  products-db:
+    container_name: ec-products-db
+    image: postgres:14
+    restart: always
+    networks:
+      - backend
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  products:
+    container_name: ec-products
+    build:
+      context: ./products
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - backend
+    depends_on:
+      - eureka
+      - products-db
+
+  orders:
+    container_name: ec-orders
+    build:
+      context: ./orders
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - backend
+    depends_on:
+      - eureka
+      - orders-db
+      - rabbitmq
+
+  orders-db:
+    container_name: ec-orders-db
+    image: mongo:5
+    restart: always
+    networks:
+      - backend
+
+  users-db:
+    container_name: ec-users-db
+    image: mongo:5
+    restart: always
+    networks:
+      - backend
+
+  users:
+    container_name: ec-users
+    build:
+      context: ./users
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - backend
+    depends_on:
+      - eureka
+      - users-db
+
+  payments:
+    container_name: ec-payments
+    build:
+      context: ./payments
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - backend
+    depends_on:
+      - eureka
+      - rabbitmq
+
+  gateway:
+    container_name: ec-gateway
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - backend
+    ports:
+      - '5000:5000'
+    depends_on:
+      - eureka
+      - users
+      - products
+      - orders
+
+  prometheus:
+    container_name: ec-prometheus
+    image: prom/prometheus
+    restart: always
+    networks:
+      - backend
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on:
+      - eureka
+      - gateway
+      - products
+      - users
+      - payments
+      - orders

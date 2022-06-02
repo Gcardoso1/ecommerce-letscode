@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: users-service
+  data:
+    mongodb:
+      uri: mongodb://ec-users-db:27017/users
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://ec-eureka:8761/eureka/
+  instance:
+    hostname: ec-users
