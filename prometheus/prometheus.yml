@@ -1,0 +1,44 @@
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: 'ec-prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'ec-prometheus:7070' ]
+
+  - job_name: 'ec-eureka'
+    scrape_interval: 5s
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'ec-eureka:8761' ]
+
+  - job_name: 'ec-gateway'
+    scrape_interval: 5s
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'ec-gateway:5000' ]
+
+  - job_name: 'ec-users'
+    scrape_interval: 5s
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'ec-users:8084' ]
+
+  - job_name: 'ec-payments'
+    scrape_interval: 5s
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'ec-payments:8083' ]
+
+  - job_name: 'ec-products'
+    scrape_interval: 5s
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'ec-products:8082' ]
+
+  - job_name: 'ec-orders'
+    scrape_interval: 5s
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'ec-orders:8081' ]
